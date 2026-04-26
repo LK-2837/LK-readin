@@ -11,7 +11,7 @@ HISTORY_FILE = "student_history.json"
 # --- [부교재 1: 뿌리깊은 초등국어 정밀 데이터베이스] ---
 SUB_BOOK_INFO = {
     "1단계": {
-        "1회차": "맑은 상태인 '투명'과 기준에 따른 '구분'의 개념을 익히고, 시간의 흐름인 '동안'과 '다음'의 정확한 쓰임을 학습했습니다.",
+        "1회차": "사물의 상태를 나타내는 '투명', '구분'의 개념을 익히고, 시간의 흐름인 '동안'과 '다음'의 정확한 쓰임을 학습했습니다.",
         "2회차": "전래 풍속인 '민속' 어휘를 배우고, 설날·추석·동지의 풍습과 관련된 어휘를 정리했습니다.",
         "3회차": "상대를 청하는 '초대'와 기쁜 날의 '잔치', '축하'와 '연락'의 의미 차이를 파악하며 상황별 어휘력을 높였습니다.",
         "4회차": "웃는 모양 '생글생글'과 코를 벌리는 '발름발름' 등 의태어를 통해 모양을 흉내 내는 말의 생동감을 체득했습니다.",
@@ -134,7 +134,7 @@ if st.session_state.page == 'input':
 
     st.divider()
 
-    # 4. [부교재 2] 어휘가 문해력이다 (자유 입력 추가)
+    # 4. [부교재 2] 어휘가 문해력이다
     st.subheader("📖 4. [부교재 2] 어휘가 문해력이다")
     use_sub2 = st.checkbox("어휘가 문해력이다 포함", value=False)
     sub2_info_text = ""
@@ -145,8 +145,9 @@ if st.session_state.page == 'input':
         tm3, tm4 = st.columns(2)
         sub2_min = tm3.selectbox("분  ", TIME_MIN, key="sub2_min")
         sub2_sec = tm4.selectbox("초  ", TIME_SEC, key="sub2_sec")
-        sub2_content = st.text_area("활동 상세 내용 (어휘)", placeholder="학습한 어휘나 문해 활동 내용을 입력하세요.", key="sub2_text")
-        sub2_info_text = f"• 부교재: 어휘가 문해력이다 [{sub2_level} - {sub2_unit}] ({sub2_min} {sub2_sec})\n  - 활동: {sub2_content}\n"
+        # --- [추가된 부분] '어휘가 문해력이다' 자유 입력 칸 ---
+        sub2_custom_content = st.text_area("활동 상세 내용 (어휘)", placeholder="학습한 어휘나 문해 활동 내용을 입력하세요.", key=f"sub2_custom_{sub2_level}_{sub2_unit}")
+        sub2_info_text = f"• 부교재: 어휘가 문해력이다 [{sub2_level} - {sub2_unit}] ({sub2_min} {sub2_sec})\n  - 활동: {sub2_custom_content}\n"
 
     st.divider()
 
