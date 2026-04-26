@@ -22,82 +22,84 @@ SUB_BOOK_INFO = {
 
 VOCAB_LITERACY_LEVELS = ["1-1", "1-2", "2-1", "2-2", "3-1", "3-2", "4-1", "4-2", "5-1", "5-2", "6-1", "6-2"]
 
-# --- [UI 로직] ---
+# --- [UI 시작] ---
 if "page" not in st.session_state: st.session_state.page = 'input'
 
 if st.session_state.page == 'input':
     st.title("📚 엘케이리드인독서논술학원")
     st.subheader("학습 리포트 생성기")
 
-    # 1. 기본 정보
+    # 학생 및 기본 정보
     st.divider()
-    name = st.text_input("학생 이름")
+    name = st.text_input("학생 이름 (필수)")
     grade = st.selectbox("학년", ["초등", "중등", "고등"])
     report_date = st.date_input("학습일", value=datetime.today())
 
-    # 2. 주교재 진단
+    # 주교재 진단
     st.divider()
-    st.subheader("📝 주교재 진단")
+    st.subheader("📝 주교재 진단 결과")
     v_book = st.text_input("도서명", value="리드인 독서")
     cv1, cv2, cv3 = st.columns(3)
     v_unit = cv1.selectbox("회차", [f"{i}회차" for i in range(1, 5)])
     v_score = cv2.number_input("맞은 개수", 0, 10, 10)
     v_status = cv3.selectbox("결과", ["통과", "미통과"])
 
-    # 3. 부교재 상세 입력 (여기가 핵심입니다)
+    # 부교재 상세 입력 섹션
     st.divider()
-    st.subheader("📖 부교재 학습 (해당 교재를 체크하세요)")
+    st.subheader("📖 부교재 학습 상세 (선택 시 입력창이 나타납니다)")
 
     # --- 부교재 1: 뿌리깊은 초등국어 ---
     sub1_final = ""
-    if st.checkbox("1. 뿌리깊은 초등국어 포함"):
+    if st.checkbox("✅ 뿌리깊은 초등국어 포함"):
         c1, c2 = st.columns(2)
         step = c1.selectbox("단계", [f"{i}단계" for i in range(1, 7)])
         unit = c2.selectbox("회차 ", [f"{i}회차" for i in range(1, 41)])
-        s1_time = st.selectbox("소요시간(분)", [f"{i}분" for i in range(61)], key="time1")
+        s1_time = st.selectbox("소요시간(분)", [f"{i}분" for i in range(61)], key="t1")
         
-        # 실제 해설지 데이터 가져오기
-        db_val = SUB_BOOK_INFO.get(step, {}).get(unit, f"{step} {unit} 어휘 및 어법 학습을 진행했습니다.")
-        sub1_msg = st.text_area("학습 포인트 (해설지 내용)", value=db_val, key=f"area1_{step}_{unit}")
+        db_val = SUB_BOOK_INFO.get(step, {}).get(unit, f"{step} {unit} 어휘 학습을 완료했습니다.")
+        sub1_msg = st.text_area("뿌리깊은 국어 - 학습 포인트", value=db_val, key=f"area1_{step}_{unit}")
         sub1_final = f"• 부교재: 뿌리깊은초등국어 [{step}-{unit}] ({s1_time})\n[학습 포인트]\n{sub1_msg}\n\n"
 
-    # --- 부교재 2: 어휘가 문해력이다 (선생님이 고대하시던 입력칸!) ---
+    # --- 부교재 2: 어휘가 문해력이다 (선생님이 찾으시던 부분) ---
     sub2_final = ""
-    if st.checkbox("2. 어휘가 문해력이다 포함"):
+    st.write("") # 간격 조절
+    if st.checkbox("✅ 어휘가 문해력이다 포함"):
+        # 체크박스를 누르는 순간 아래 위젯들이 나타납니다.
         c3, c4 = st.columns(2)
         lv = c3.selectbox("레벨", VOCAB_LITERACY_LEVELS)
         ut = c4.selectbox("회차  ", [f"{i}회차" for i in range(1, 41)])
-        s2_time = st.selectbox("소요시간(분) ", [f"{i}분" for i in range(61)], key="time2")
+        s2_time = st.selectbox("소요시간(분) ", [f"{i}분" for i in range(61)], key="t2")
         
-        # ❗ 이 상자가 바로 나타나야 합니다 ❗
-        sub2_custom = st.text_area("어휘가 문해력이다 - 상세 활동 내용 입력", 
-                                   placeholder="배운 어휘나 문장 만들기 활동 등 상세 내용을 적어주세요.",
-                                   key=f"area2_{lv}_{ut}")
+        # ❗ 이 입력 상자가 화면에 바로 나타나야 합니다.
+        sub2_custom = st.text_area("어휘가 문해력이다 - 상세 활동 내용", 
+                                   placeholder="학습한 어휘나 문장 만들기 활동 등 상세 내용을 적어주세요.",
+                                   key=f"area2_{lv}_{ut}",
+                                   height=100)
         sub2_final = f"• 부교재: 어휘가 문해력이다 [{lv}-{ut}] ({s2_time})\n  - 활동: {sub2_custom}\n\n"
 
     # --- 부교재 3: 독서평설 ---
     sub3_final = ""
-    if st.checkbox("3. 독서평설 포함"):
+    if st.checkbox("✅ 독서평설 포함"):
         s3_type = st.selectbox("구분", ["초등", "중등"])
-        sub3_msg = st.text_area("독서평설 학습 주제 및 내용", key="area3")
+        sub3_msg = st.text_area("독서평설 상세 내용 입력", key="area3")
         sub3_final = f"• 부교재: 독서평설({s3_type})\n  - 내용: {sub3_msg}\n\n"
 
     # --- 부교재 4: 신문 ---
     sub4_final = ""
-    if st.checkbox("4. 신문 포함"):
-        sub4_msg = st.text_area("신문 기사 요약 및 활동 내용", key="area4")
+    if st.checkbox("✅ 신문 포함"):
+        sub4_msg = st.text_area("신문 활동 상세 내용 입력", key="area4")
         sub4_final = f"• 부교재: 신문 활동\n  - 내용: {sub4_msg}\n\n"
 
     st.divider()
-    footer = "아이에게 '읽은 책 자랑'을 꼭 시켜주세요~ 더불어 많은 칭찬과 격려부탁드립니다. 감사합니다!"
-    comment = st.text_area("종합 피드백", value=footer)
+    footer_msg = "아이에게 '읽은 책 자랑'을 꼭 시켜주세요~ 더불어 많은 칭찬과 격려부탁드립니다. 감사합니다!"
+    comment = st.text_area("선생님 종합 피드백", value=footer_msg)
 
-    if st.button("🚀 리포트 생성하기", type="primary"):
+    if st.button("🚀 학습 리포트 생성", type="primary"):
         if not name:
-            st.error("이름을 입력해야 리포트가 생성됩니다!")
+            st.error("학생 이름을 입력해야 리포트 생성이 가능합니다.")
         else:
             all_subs = sub1_final + sub2_final + sub3_final + sub4_final
-            final_report = f"""[ 엘케이리드인독서논술학원 학습 리포트 ]
+            report = f"""[ 엘케이리드인독서논술학원 학습 리포트 ]
 
 ■ 대상: {grade} {name} 학생
 ■ 학습일: {report_date}
@@ -111,13 +113,13 @@ if st.session_state.page == 'input':
 {all_subs}
 [선생님 피드백]
 {comment}"""
-            st.session_state.final_text = final_report
+            st.session_state.final_text = report
             st.session_state.page = 'result'
             st.rerun()
 
 elif st.session_state.page == 'result':
     st.title("📄 생성된 리포트")
-    st.text_area("복사해서 사용하세요", st.session_state.final_text, height=600)
-    if st.button("처음으로 돌아가기"):
+    st.text_area("내용 복사용 (전체 선택 후 복사하세요)", st.session_state.final_text, height=600)
+    if st.button("다시 만들기"):
         st.session_state.page = 'input'
         st.rerun()
